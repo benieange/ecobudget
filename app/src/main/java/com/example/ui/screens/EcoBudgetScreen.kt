@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.R
-import com.example.model.Category
+import com.example.ecobudget.domain.model.Category
 import com.example.ui.components.AddTransactionDialog
 import com.example.ui.components.MonthNavigatorBar
 import com.example.ui.components.TransactionCard

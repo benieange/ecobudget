@@ -1,4 +1,4 @@
-package com.example.model
+package com.example.ecobudget.domain.model
 
 /**
  * Modèle de données immuable représentant une transaction / dépense au sein d'EcoBudget.

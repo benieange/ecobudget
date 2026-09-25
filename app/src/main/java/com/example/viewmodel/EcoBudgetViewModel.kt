@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.FakeTransactionRepository
 import com.example.data.repository.TransactionRepository
-import com.example.model.Category
-import com.example.model.Transaction
-import com.example.model.YearMonth
+import com.example.ecobudget.domain.model.Category
+import com.example.ecobudget.domain.model.Transaction
+import com.example.ecobudget.domain.model.YearMonth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

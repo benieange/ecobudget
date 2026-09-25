@@ -83,12 +83,14 @@ dependencies {
 
   // Coroutines
   implementation(libs.kotlinx.coroutines.android)
-  implementation(libs.kotlinx.coroutines.core)
 
   // Base locale (à retirer si vous n'utilisez pas Room)
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
   "ksp"(libs.androidx.room.compiler)
+
+  implementation(project(":shared"))
+
 
   // Tests unitaires
   testImplementation(libs.junit)

@@ -43,8 +43,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
-import com.example.model.Category
-import com.example.model.Transaction
+import com.example.ecobudget.domain.model.Category
+import com.example.ecobudget.domain.model.Transaction
 import com.example.ui.theme.DarkDialogBackground
 import com.example.ui.theme.DarkDialogChipInactive
 import com.example.ui.theme.DarkDialogFieldBackground

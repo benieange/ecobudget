@@ -1,7 +1,7 @@
 package com.example.data.repository
 
-import com.example.model.Category
-import com.example.model.Transaction
+import com.example.ecobudget.domain.model.Category
+import com.example.ecobudget.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
