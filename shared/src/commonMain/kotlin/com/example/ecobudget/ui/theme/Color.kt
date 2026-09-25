@@ -1,0 +1,41 @@
+package com.example.ecobudget.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val VioletPrimary = Color(0xFF7C3AED)
+val VioletPrimaryLight = Color(0xFF8B5CF6)
+val VioletOnPrimary = Color(0xFFFFFFFF)
+val VioletPrimaryContainer = Color(0xFF4C1D95)
+val VioletOnPrimaryContainer = Color(0xFFF5F3FF)
+val VioletCardHero = Color(0xFF5B21B6)
+
+val DarkBackground = Color(0xFF0F0F14)
+val DarkOnBackground = Color(0xFFF4F4F8)
+val DarkSurface = Color(0xFF181920)
+val DarkOnSurface = Color(0xFFF4F4F8)
+val DarkSurfaceVariant = Color(0xFF22242E)
+val DarkOnSurfaceVariant = Color(0xFFE2E2EC)
+val DarkOutline = Color(0xFF383A48)
+val DarkOutlineVariant = Color(0xFF2B2D38)
+val DarkTextSecondary = Color(0xFFB4B7C5)
+val DarkCardBadge = Color(0xFF2E2648)
+
+val DarkDialogBackground = Color(0xFF232534)
+val DarkDialogOutline = Color(0xFF524874)
+val DarkDialogFieldBackground = Color(0xFF161722)
+val DarkDialogChipInactive = Color(0xFF2E3144)
+
+val LightBackground = Color(0xFFF8F7FC)
+val LightOnBackground = Color(0xFF13131A)
+val LightPrimary = Color(0xFF7C3AED)
+val LightOnPrimary = Color(0xFFFFFFFF)
+val LightPrimaryContainer = Color(0xFFEDE9FE)
+val LightOnPrimaryContainer = Color(0xFF3B0764)
+val LightSurface = Color(0xFFFFFFFF)
+val LightOnSurface = Color(0xFF13131A)
+val LightSurfaceVariant = Color(0xFFEFEBFA)
+val LightOnSurfaceVariant = Color(0xFF4C4A5A)
+val LightOutline = Color(0xFFCBC6DB)
+val LightOutlineVariant = Color(0xFFE4E1EF)
+val LightTextSecondary = Color(0xFF6B677C)
+val LightCardBadge = Color(0xFFDDD6FE)

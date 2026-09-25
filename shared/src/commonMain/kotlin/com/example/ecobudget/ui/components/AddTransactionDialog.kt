@@ -1,4 +1,4 @@
-package com.example.ui.components
+package com.example.ecobudget.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,27 +35,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.R
 import com.example.ecobudget.domain.model.Category
 import com.example.ecobudget.domain.model.Transaction
-import com.example.ui.theme.DarkDialogBackground
-import com.example.ui.theme.DarkDialogChipInactive
-import com.example.ui.theme.DarkDialogFieldBackground
-import com.example.ui.theme.DarkDialogOutline
-import com.example.ui.theme.DarkOutline
-import com.example.ui.theme.DarkTextSecondary
-import com.example.ui.theme.VioletPrimary
-import com.example.ui.theme.VioletPrimaryLight
+import com.example.ecobudget.ui.theme.DarkDialogBackground
+import com.example.ecobudget.ui.theme.DarkDialogChipInactive
+import com.example.ecobudget.ui.theme.DarkDialogFieldBackground
+import com.example.ecobudget.ui.theme.DarkDialogOutline
+import com.example.ecobudget.ui.theme.DarkOutline
+import com.example.ecobudget.ui.theme.DarkTextSecondary
+import com.example.ecobudget.ui.theme.VioletPrimary
+import com.example.ecobudget.ui.theme.VioletPrimaryLight
 
 /**
- * Boîte de dialogue permettant l'enregistrement ou la modification d'une dépense.
+ * Boîte de dialogue KMP permettant l'enregistrement ou la modification d'une dépense.
  *
  * @param initialTransaction Transaction à modifier si en mode édition, ou null si nouvelle dépense.
  * @param onDismissRequest Déclenché lors de l'annulation ou fermeture.
@@ -94,6 +92,17 @@ fun AddTransactionDialog(
         onDismissRequest()
     }
 
+    val handleConfirm = {
+        val parsedAmount = amountText.toDoubleOrNull()
+        if (title.isNotBlank() && parsedAmount != null && parsedAmount > 0) {
+            keyboardController?.hide()
+            focusManager.clearFocus()
+            onConfirm(title.trim(), parsedAmount, selectedCategory)
+        } else {
+            isError = true
+        }
+    }
+
     AlertDialog(
         onDismissRequest = handleDismiss,
         shape = RoundedCornerShape(28.dp),
@@ -105,11 +114,7 @@ fun AddTransactionDialog(
         ),
         title = {
             Text(
-                text = if (isEditMode) {
-                    stringResource(R.string.dialog_title_edit)
-                } else {
-                    stringResource(R.string.dialog_title_new)
-                },
+                text = if (isEditMode) "Modifier la dépense" else "Nouvelle dépense",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -123,15 +128,15 @@ fun AddTransactionDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Titre
+                // Saisie du Titre
                 OutlinedTextField(
                     value = title,
                     onValueChange = {
                         title = it
                         if (isError) isError = false
                     },
-                    label = { Text(stringResource(R.string.label_transaction_title)) },
-                    placeholder = { Text(stringResource(R.string.placeholder_transaction_title), color = DarkTextSecondary) },
+                    label = { Text("Titre de la dépense") },
+                    placeholder = { Text("Ex: Courses supermarché", color = DarkTextSecondary) },
                     singleLine = true,
                     isError = isError && title.isBlank(),
                     keyboardOptions = KeyboardOptions(
@@ -158,7 +163,7 @@ fun AddTransactionDialog(
                         .testTag("input_transaction_title")
                 )
 
-                // Montant en FCFA
+                // Saisie du Montant
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = {
@@ -167,13 +172,13 @@ fun AddTransactionDialog(
                             if (isError) isError = false
                         }
                     },
-                    label = { Text(stringResource(R.string.label_transaction_amount)) },
-                    placeholder = { Text(stringResource(R.string.placeholder_transaction_amount), color = DarkTextSecondary) },
+                    label = { Text("Montant") },
+                    placeholder = { Text("Ex: 5000", color = DarkTextSecondary) },
                     singleLine = true,
-                    isError = isError && amountText.isBlank(),
+                    isError = isError && (amountText.isBlank() || amountText.toDoubleOrNull() == null),
                     trailingIcon = {
                         Text(
-                            text = stringResource(R.string.currency_fcfa),
+                            text = "FCFA",
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
                             color = VioletPrimaryLight,
@@ -207,59 +212,60 @@ fun AddTransactionDialog(
                         .testTag("input_transaction_amount")
                 )
 
-                // Sélecteur de catégorie
+                // Sélection de Catégorie
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = stringResource(R.string.label_category),
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 13.sp,
+                        text = "Catégorie",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
                         ),
-                        color = Color.White
+                        color = DarkTextSecondary
                     )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Category.entries.forEach { category ->
-                            val isSelected = category == selectedCategory
-                            val label = stringResource(category.labelResId)
+                    val categories = Category.entries.toTypedArray()
+                    val rows = categories.toList().chunked(2)
 
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(
-                                        if (isSelected) VioletPrimary else DarkDialogChipInactive
-                                    )
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (isSelected) VioletPrimary else DarkOutline,
-                                        shape = RoundedCornerShape(14.dp)
-                                    )
-                                    .clickable {
-                                        keyboardController?.hide()
-                                        selectedCategory = category
-                                    }
-                                    .padding(vertical = 8.dp, horizontal = 4.dp),
-                                contentAlignment = Alignment.Center
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        for (row in rows) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Text(text = category.emoji, fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 10.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                                        ),
-                                        color = if (isSelected) Color.White else Color(0xFFE2E2EC),
-                                        maxLines = 1
-                                    )
+                                for (category in row) {
+                                    val isSelected = category == selectedCategory
+                                    val categoryLabel = category.name.lowercase().replaceFirstChar { it.uppercase() }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(14.dp))
+                                            .background(
+                                                if (isSelected) VioletPrimary else DarkDialogChipInactive
+                                            )
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) VioletPrimaryLight else DarkOutline,
+                                                shape = RoundedCornerShape(14.dp)
+                                            )
+                                            .clickable { selectedCategory = category }
+                                            .padding(vertical = 10.dp, horizontal = 8.dp)
+                                            .testTag("category_chip_${category.name.lowercase()}"),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(text = category.emoji, fontSize = 14.sp)
+                                            Text(
+                                                text = categoryLabel,
+                                                fontSize = 12.sp,
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -269,41 +275,27 @@ fun AddTransactionDialog(
         },
         confirmButton = {
             Button(
-                onClick = {
-                    val parsedAmount = amountText.toDoubleOrNull()
-                    if (title.isNotBlank() && parsedAmount != null && parsedAmount > 0.0) {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        onConfirm(title, parsedAmount, selectedCategory)
-                    } else {
-                        isError = true
-                    }
-                },
+                onClick = handleConfirm,
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = VioletPrimary,
                     contentColor = Color.White
                 ),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.testTag("button_confirm_add_transaction")
+                modifier = Modifier.testTag("btn_confirm_transaction")
             ) {
                 Text(
-                    text = if (isEditMode) {
-                        stringResource(R.string.btn_save)
-                    } else {
-                        stringResource(R.string.btn_add)
-                    },
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    text = if (isEditMode) "Enregistrer" else "Ajouter",
+                    fontWeight = FontWeight.Bold
                 )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = handleDismiss,
-                modifier = Modifier.testTag("button_cancel_add_transaction")
+                modifier = Modifier.testTag("btn_cancel_transaction")
             ) {
                 Text(
-                    text = stringResource(R.string.btn_cancel),
+                    text = "Annuler",
                     color = DarkTextSecondary,
                     fontWeight = FontWeight.Medium
                 )

@@ -1,4 +1,4 @@
-package com.example.viewmodel
+package com.example.ecobudget.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,23 +13,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import java.util.UUID
+import kotlinx.datetime.Clock
+import kotlin.random.Random
 
 /**
  * Classe de données immuable représentant l'état complet de l'interface pour EcoBudget.
- *
- * @property currentMonth Mois actuellement sélectionné dans le navigateur.
- * @property filteredTransactions Liste des transactions filtrées selon le mois actif et les catégories sélectionnées.
- * @property monthTransactions Liste des transactions du mois actif.
- * @property allTransactions Liste globale de l'ensemble des dépenses enregistrées.
- * @property selectedCategories Ensemble immuable des catégories sélectionnées (vide = toutes les catégories).
- * @property monthlyBudget Budget mensuel alloué pour le mois.
- * @property totalSpent Montant cumulé calculé des dépenses du mois actif.
- * @property categorySpent Montant cumulé des dépenses des catégories sélectionnées pour le mois actif.
- * @property remainingBudget Montant restant calculé du budget mensuel pour le mois actif.
- * @property isAddDialogOpen Indique si la boîte de dialogue d'enregistrement est visible.
- * @property editingTransaction Transaction en cours d'édition (ou null si mode création / fermé).
  */
 data class EcoBudgetUiState(
     val currentMonth: YearMonth = YearMonth.current(),
@@ -165,8 +153,6 @@ class EcoBudgetViewModel(
 
     /**
      * Bascule la sélection d'une catégorie (support multi-sélection).
-     * Si la catégorie était sélectionnée, on la retire.
-     * Si elle n'était pas sélectionnée, on l'ajoute.
      */
     fun toggleCategory(category: Category) {
         val currentSet = _selectedCategories.value
@@ -227,21 +213,11 @@ class EcoBudgetViewModel(
                 )
                 repository.updateTransaction(updated)
             } else {
-                // Création d'une nouvelle transaction dans le mois affiché
-                val currentYearMonth = _currentMonth.value
-                val dateToUse = if (currentYearMonth == YearMonth.current()) {
-                    System.currentTimeMillis()
-                } else {
-                    val cal = Calendar.getInstance()
-                    cal.set(Calendar.YEAR, currentYearMonth.year)
-                    cal.set(Calendar.MONTH, currentYearMonth.month)
-                    cal.set(Calendar.DAY_OF_MONTH, 15)
-                    cal.set(Calendar.HOUR_OF_DAY, 12)
-                    cal.timeInMillis
-                }
+                // Création d'une nouvelle transaction
+                val dateToUse = Clock.System.now().toEpochMilliseconds()
 
                 val newTransaction = Transaction(
-                    id = UUID.randomUUID().toString(),
+                    id = generateUniqueId(),
                     title = title.trim(),
                     amount = amount,
                     date = dateToUse,
@@ -260,5 +236,13 @@ class EcoBudgetViewModel(
         viewModelScope.launch {
             repository.deleteTransaction(id)
         }
+    }
+
+    /**
+     * Génère un identifiant unique compatible Kotlin Pure/KMP.
+     */
+    private fun generateUniqueId(): String {
+        val timestamp = Clock.System.now().toEpochMilliseconds()
+        return "$timestamp-${Random.nextLong(100000, 999999)}"
     }
 }

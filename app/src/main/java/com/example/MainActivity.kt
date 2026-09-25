@@ -8,18 +8,19 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.ui.screens.EcoBudgetScreen
-import com.example.ui.theme.MyApplicationTheme
-import com.example.viewmodel.EcoBudgetViewModel
+import com.example.ecobudget.ui.screens.EcoBudgetScreen
+import com.example.ecobudget.ui.theme.EcoBudgetTheme
+import com.example.ecobudget.viewmodel.EcoBudgetViewModel
 
 class MainActivity : ComponentActivity() {
+
   private val viewModel: EcoBudgetViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      MyApplicationTheme {
+      EcoBudgetTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
           EcoBudgetScreen(viewModel = viewModel)
         }
@@ -27,4 +28,3 @@ class MainActivity : ComponentActivity() {
     }
   }
 }
-

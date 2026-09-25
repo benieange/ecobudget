@@ -29,17 +29,22 @@ kotlin {
     // Dépendances communes
     sourceSets {
         commonMain.dependencies {
-// Asynchronisme et flux réactifs
+            // Asynchronisme et flux réactifs
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 
-// Gestion de l'état UI et cycle de vie multiplateforme
+            // Gestion de l'état UI et cycle de vie multiplateforme
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.8.0")
 
-// Manipulation multiplateforme des dates et heures
+            // Manipulation multiplateforme des dates et heures
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
-// Ressources CMP (exposées à app) et Runtime Compose
-            api(compose.components.resources)
+            // --- CORRECTION DES DÉPENDANCES COMPOSE MULTIPLATFORM ---
             implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended) // Pour Icons.Default.Add, Check, Edit, Delete, etc.
+
+            // Ressources CMP
+            implementation(compose.components.resources)
         }
     }
 
@@ -63,3 +68,4 @@ android {
 compose.resources {
     publicResClass = true
 }
+

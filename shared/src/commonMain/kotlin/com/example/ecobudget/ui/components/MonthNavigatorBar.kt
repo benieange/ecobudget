@@ -1,4 +1,4 @@
-package com.example.ui.components
+package com.example.ecobudget.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,24 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.R
 import com.example.ecobudget.domain.model.YearMonth
-import com.example.ui.theme.DarkOutline
-import com.example.ui.theme.DarkSurfaceVariant
-import com.example.ui.theme.VioletPrimary
+import com.example.ecobudget.ui.theme.DarkOutline
+import com.example.ecobudget.ui.theme.DarkSurfaceVariant
+import com.example.ecobudget.ui.theme.VioletPrimary
 
-/**
- * Navigateur mensuel élégant permettant de passer d'un mois à l'autre (◀ Mois Année ▶).
- *
- * @param currentMonth Mois actuellement sélectionné.
- * @param onPreviousMonth Callback pour passer au mois précédent.
- * @param onNextMonth Callback pour passer au mois suivant.
- * @param onCurrentMonthClick Callback pour revenir au mois courant au clic sur le libellé.
- */
 @Composable
 fun MonthNavigatorBar(
     currentMonth: YearMonth,
@@ -71,7 +61,6 @@ fun MonthNavigatorBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Bouton Mois Précédent
             IconButton(
                 onClick = onPreviousMonth,
                 modifier = Modifier
@@ -81,13 +70,12 @@ fun MonthNavigatorBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = stringResource(R.string.nav_prev_month),
+                    contentDescription = "Mois précédent",
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
             }
 
-            // Mois et Année affichés
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -96,10 +84,7 @@ fun MonthNavigatorBar(
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .testTag("current_month_label")
             ) {
-                Text(
-                    text = "🗓️",
-                    fontSize = 16.sp
-                )
+                Text(text = "🗓️", fontSize = 16.sp)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = currentMonth.displayLabel,
@@ -119,7 +104,7 @@ fun MonthNavigatorBar(
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.current_month_badge),
+                            text = "En cours",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
@@ -130,7 +115,6 @@ fun MonthNavigatorBar(
                 }
             }
 
-            // Bouton Mois Suivant
             IconButton(
                 onClick = onNextMonth,
                 modifier = Modifier
@@ -140,7 +124,7 @@ fun MonthNavigatorBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = stringResource(R.string.nav_next_month),
+                    contentDescription = "Mois suivant",
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )

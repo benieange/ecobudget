@@ -1,4 +1,4 @@
-package com.example.ui.theme
+package com.example.ecobudget.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -63,4 +63,3 @@ val Typography =
         letterSpacing = 0.5.sp,
       ),
   )
-

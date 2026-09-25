@@ -1,4 +1,4 @@
-package com.example.ui.screens
+package com.example.ecobudget.ui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -36,33 +36,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.R
 import com.example.ecobudget.domain.model.Category
-import com.example.ui.components.AddTransactionDialog
-import com.example.ui.components.MonthNavigatorBar
-import com.example.ui.components.TransactionCard
-import com.example.ui.theme.DarkBackground
-import com.example.ui.theme.DarkOutline
-import com.example.ui.theme.DarkSurfaceVariant
-import com.example.ui.theme.DarkTextSecondary
-import com.example.ui.theme.VioletCardHero
-import com.example.ui.theme.VioletPrimary
-import com.example.ui.theme.VioletPrimaryLight
-import com.example.viewmodel.EcoBudgetViewModel
-import java.text.NumberFormat
-import java.util.Locale
+import com.example.ecobudget.ui.components.AddTransactionDialog
+import com.example.ecobudget.ui.components.MonthNavigatorBar
+import com.example.ecobudget.ui.components.TransactionCard
+import com.example.ecobudget.ui.theme.DarkBackground
+import com.example.ecobudget.ui.theme.DarkOutline
+import com.example.ecobudget.ui.theme.DarkSurfaceVariant
+import com.example.ecobudget.ui.theme.DarkTextSecondary
+import com.example.ecobudget.ui.theme.VioletCardHero
+import com.example.ecobudget.ui.theme.VioletPrimary
+import com.example.ecobudget.ui.theme.VioletPrimaryLight
+import com.example.ecobudget.viewmodel.EcoBudgetViewModel
+import androidx.compose.runtime.remember
 
 /**
  * Écran principal d'EcoBudget :
@@ -71,20 +67,13 @@ import java.util.Locale
  * - Sélection d'une ou plusieurs catégories simultanément.
  * - Modification d'une dépense au clic direct sur sa carte.
  * - Suppression d'une dépense.
- * - Internationalisation complète via strings.xml.
  */
 @Composable
 fun EcoBudgetScreen(
     viewModel: EcoBudgetViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val formatFcfa = remember {
-        val nf = NumberFormat.getNumberInstance(Locale.FRENCH)
-        nf.maximumFractionDigits = 0
-        nf
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = modifier
@@ -103,7 +92,7 @@ fun EcoBudgetScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.content_desc_add_transaction),
+                    contentDescription = "Ajouter une transaction",
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -160,22 +149,17 @@ fun EcoBudgetScreen(
                 // Section 4 : Bandeau récapitulatif des Catégories sélectionnées
                 item(key = "category_spent_summary") {
                     val summaryTitle = when {
-                        uiState.isAllCategoriesSelected -> stringResource(R.string.all_categories_summary)
+                        uiState.isAllCategoriesSelected -> "Toutes les catégories"
                         uiState.selectedCategories.size == 1 -> {
                             val cat = uiState.selectedCategories.first()
-                            "${cat.emoji} ${stringResource(cat.labelResId)}"
+                            val label = cat.name.lowercase().replaceFirstChar { it.uppercase() }
+                            "${cat.emoji} $label"
                         }
                         else -> {
                             val emojis = uiState.selectedCategories.joinToString(" ") { it.emoji }
-                            stringResource(
-                                R.string.multiple_categories_selected_format,
-                                emojis,
-                                uiState.selectedCategories.size
-                            )
+                            "$emojis (${uiState.selectedCategories.size} sélectionnées)"
                         }
                     }
-
-                    val currencyFcfa = stringResource(R.string.currency_fcfa)
 
                     Surface(
                         modifier = Modifier
@@ -205,11 +189,7 @@ fun EcoBudgetScreen(
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = stringResource(
-                                        R.string.expense_count_month_format,
-                                        uiState.filteredTransactions.size,
-                                        uiState.currentMonth.displayLabel
-                                    ),
+                                    text = "${uiState.filteredTransactions.size} dépense(s) • ${uiState.currentMonth.displayLabel}",
                                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
                                     color = DarkTextSecondary
                                 )
@@ -219,7 +199,7 @@ fun EcoBudgetScreen(
 
                             // Total des catégories sélectionnées
                             Text(
-                                text = "${formatFcfa.format(uiState.categorySpent)} $currencyFcfa",
+                                text = "${formatAmount(uiState.categorySpent)} FCFA",
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -234,10 +214,7 @@ fun EcoBudgetScreen(
                 // Section 5 : Titre de la liste des transactions
                 item(key = "transactions_section_title") {
                     Text(
-                        text = stringResource(
-                            R.string.transactions_detail_title_format,
-                            uiState.currentMonth.displayLabel
-                        ),
+                        text = "Détail des dépenses • ${uiState.currentMonth.displayLabel}",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
@@ -249,7 +226,7 @@ fun EcoBudgetScreen(
                     )
                 }
 
-                // Section 6 : Liste verticale avec TransactionCard (cliquable pour édition)
+                // Section 6 : Liste verticale avec TransactionCard
                 if (uiState.filteredTransactions.isEmpty()) {
                     item(key = "empty_transactions_state") {
                         EmptyTransactionsView(
@@ -296,7 +273,7 @@ private fun EcoBudgetCleanHeader() {
             .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         Text(
-            text = stringResource(R.string.app_subtitle),
+            text = "TABLEAU DE BORD",
             style = MaterialTheme.typography.labelSmall.copy(
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
@@ -306,7 +283,7 @@ private fun EcoBudgetCleanHeader() {
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            text = stringResource(R.string.app_name),
+            text = "EcoBudget",
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -334,12 +311,6 @@ private fun EcoBudgetOverviewCard(
         label = "budget_progress"
     )
 
-    val formatFcfa = remember {
-        val nf = NumberFormat.getNumberInstance(Locale.FRENCH)
-        nf.maximumFractionDigits = 0
-        nf
-    }
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -355,14 +326,13 @@ private fun EcoBudgetOverviewCard(
                 .fillMaxWidth()
                 .padding(22.dp)
         ) {
-            // Libellé principal avec le mois
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.budget_remaining_title),
+                    text = "BUDGET RESTANT",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
@@ -383,13 +353,12 @@ private fun EcoBudgetOverviewCard(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Chiffre géant : Budget Restant en FCFA
             Row(
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.testTag("remaining_budget_text")
             ) {
                 Text(
-                    text = formatFcfa.format(remainingBudget),
+                    text = formatAmount(remainingBudget),
                     style = MaterialTheme.typography.displayMedium.copy(
                         fontSize = 36.sp,
                         fontWeight = FontWeight.ExtraBold
@@ -398,7 +367,7 @@ private fun EcoBudgetOverviewCard(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = stringResource(R.string.currency_fcfa),
+                    text = "FCFA",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFEDE9FE),
@@ -408,7 +377,6 @@ private fun EcoBudgetOverviewCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Barre de progression
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -427,14 +395,13 @@ private fun EcoBudgetOverviewCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Affichage secondaire du Total des Dépenses et du pourcentage consommé
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.total_spent_format, formatFcfa.format(totalSpent)),
+                    text = "Dépenses : ${formatAmount(totalSpent)} FCFA",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -444,7 +411,7 @@ private fun EcoBudgetOverviewCard(
                 )
 
                 Text(
-                    text = stringResource(R.string.budget_usage_percent_format, usagePercentage),
+                    text = "$usagePercentage % utilisé",
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -473,10 +440,9 @@ private fun CategoryMultiFilterLazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(horizontal = 2.dp)
     ) {
-        // Puce "Tous"
         item(key = "filter_chip_all") {
             FilterCategoryChip(
-                label = stringResource(R.string.filter_all),
+                label = "Tous",
                 emoji = "✨",
                 isSelected = isAllSelected,
                 isMultiSelect = false,
@@ -485,12 +451,11 @@ private fun CategoryMultiFilterLazyRow(
             )
         }
 
-        // Puces pour chaque catégorie (multi-sélectionnable)
         items(
             items = Category.entries.toTypedArray(),
             key = { "filter_chip_${it.name}" }
         ) { category ->
-            val label = stringResource(category.labelResId)
+            val label = category.name.lowercase().replaceFirstChar { it.uppercase() }
             val isSelected = !isAllSelected && selectedCategories.contains(category)
 
             FilterCategoryChip(
@@ -506,7 +471,7 @@ private fun CategoryMultiFilterLazyRow(
 }
 
 /**
- * Puce unitaire interactive pour le filtrage multi-catégories avec indicateur de coche visuel.
+ * Puce unitaire interactive pour le filtrage multi-catégories.
  */
 @Composable
 private fun FilterCategoryChip(
@@ -549,11 +514,10 @@ private fun FilterCategoryChip(
                 color = contentColor
             )
 
-            // Coche discrète lorsque la catégorie est sélectionnée en multi-sélection
             if (isSelected && isMultiSelect) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = stringResource(R.string.content_desc_selected),
+                    contentDescription = "Sélectionné",
                     tint = Color.White,
                     modifier = Modifier.size(14.dp)
                 )
@@ -585,9 +549,9 @@ private fun EmptyTransactionsView(
             Spacer(modifier = Modifier.height(14.dp))
             Text(
                 text = if (isAllSelected) {
-                    stringResource(R.string.empty_expenses_month_format, monthLabel)
+                    "Aucune dépense enregistrée en $monthLabel"
                 } else {
-                    stringResource(R.string.empty_expenses_filtered_format, monthLabel)
+                    "Aucune dépense pour ce filtre en $monthLabel"
                 },
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 16.sp,
@@ -597,10 +561,28 @@ private fun EmptyTransactionsView(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = stringResource(R.string.empty_expenses_hint),
+                text = "Cliquez sur + pour ajouter votre première transaction.",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
                 color = DarkTextSecondary
             )
         }
     }
+}
+
+/**
+ * Formate un montant de manière portable sous Kotlin Multiplatform.
+ */
+private fun formatAmount(amount: Double): String {
+    val longAmount = amount.toLong()
+    val str = longAmount.toString()
+    val result = StringBuilder()
+    var count = 0
+    for (i in str.length - 1 downTo 0) {
+        if (count > 0 && count % 3 == 0) {
+            result.append(" ")
+        }
+        result.append(str[i])
+        count++
+    }
+    return result.reverse().toString()
 }
