@@ -2,8 +2,8 @@ package com.example.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.repository.FakeTransactionRepository
-import com.example.data.repository.TransactionRepository
+import com.example.ecobudget.data.repository.FakeTransactionRepository
+import com.example.ecobudget.data.repository.TransactionRepository
 import com.example.ecobudget.domain.model.Category
 import com.example.ecobudget.domain.model.Transaction
 import com.example.ecobudget.domain.model.YearMonth

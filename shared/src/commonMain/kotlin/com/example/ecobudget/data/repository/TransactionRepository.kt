@@ -1,4 +1,4 @@
-package com.example.data.repository
+package com.example.ecobudget.data.repository
 
 import com.example.ecobudget.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
