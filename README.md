@@ -4,7 +4,6 @@ Dépôt de base pour le projet du cours de développement mobile avancé.
 
 
 RAPPORT TECHNIQUE DE MIGRATION : ECOBUDGET
-UE Développement Mobile Avancé • Année Académique 2025-2026
 ================================================================================
 
 1. CONTEXTE ET OBJECTIFS DU PROJET
